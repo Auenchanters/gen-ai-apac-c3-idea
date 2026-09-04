@@ -60,7 +60,7 @@ The Cloud Run endpoint is public so the sign-in page can load. Every journal, me
 - Radix Themes as the single accessible component system and Phosphor as the single icon family.
 - Express 5 for the same-origin API and static delivery.
 - Firebase Web Auth for Google Sign-In; Firebase Admin Auth and Firestore through Application Default Credentials on Cloud Run.
-- `@google/genai` with `gemini-3.6-flash` as primary and the codelab fallback ladder for recoverable failures.
+- `@google/genai` with `gemini-3.6-flash` as primary and the codelab fallback ladder for recoverable failures. The credential must be a current Gemini authorization key bound to a service account, because Google rejects standard keys from September 2026.
 - Zod at every external boundary and for every structured model response.
 - Vitest, Testing Library, Supertest, Firebase Emulator Suite, fast-check, Playwright, and axe for verification.
 
@@ -146,7 +146,6 @@ Users can export or recursively delete their data. Retention is indefinite until
 
 ## Deployment contract
 
-The runtime uses a dedicated user-managed service account with Firestore access and `roles/secretmanager.secretAccessor` granted only on the Gemini secret. Cloud Run receives a numbered secret version through `--set-secrets`; no `GOOGLE_APPLICATION_CREDENTIALS` variable or key file is used. The deployment sets bounded memory, concurrency, maximum instances, startup CPU boost, and the mandatory label `dev-tutorial=cloud-run-ai-challenge`.
+The runtime uses a dedicated user-managed service account with Firestore access and `roles/secretmanager.secretAccessor` granted only on the Gemini secret. The Gemini credential is an authorization key created in AI Studio and bound to a service account, not a deprecated standard key. Cloud Run receives a numbered secret version through `--set-secrets`; no `GOOGLE_APPLICATION_CREDENTIALS` variable or key file is used. The deployment sets bounded memory, concurrency, maximum instances, startup CPU boost, and the mandatory label `dev-tutorial=cloud-run-ai-challenge`.
 
 No cloud mutation, GitHub push, or public deployment occurs until every local gate is green and the release audit reports no high or critical issue.
-

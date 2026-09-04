@@ -17,6 +17,7 @@
 - Do not push, publish, create cloud resources, deploy Firestore rules, or deploy Cloud Run until Task 12 passes.
 - Required Cloud Run label: `dev-tutorial=cloud-run-ai-challenge`.
 - Gemini primary model: `gemini-3.6-flash`; recoverable fallback sequence: `gemini-3.1-flash-lite`, `gemini-flash-latest`, `gemini-3.7-flash`.
+- The Gemini credential must be an authorization key, not a standard API key. Google documents rejection of standard keys beginning September 2026.
 - Use a dedicated runtime service account and Application Default Credentials. Never create a service-account JSON key.
 - All production source files remain focused, with explicit exported types, documented public symbols, no unsafe casts, no debug logs, and no unfinished markers.
 - The client never sends an authoritative UID, Firestore path, model ID, system instruction, or generation settings.
@@ -220,7 +221,7 @@
 - Create `docs/DEPLOYMENT.md`, `docs/OPERATIONS.md`, and `docs/decisions.md`
 - Finalize `Dockerfile` and container health behavior
 
-- [ ] Encode API enablement, dedicated service account, least-privilege IAM, numbered secret binding, Firebase/Firestore setup checks, bounded Cloud Run settings, and mandatory label in an idempotent deployment script.
+- [ ] Encode API enablement, dedicated service account, least-privilege IAM, authorization-key validation guidance, numbered secret binding, Firebase/Firestore setup checks, bounded Cloud Run settings, and mandatory label in an idempotent deployment script.
 - [ ] Make the script stop before mutation unless the exact project/account/region are confirmed and the local release manifest is green.
 - [ ] Add post-deploy checks for label, service identity, secret binding metadata, headers, body signatures, auth protection, and revision health.
 - [ ] Document rollback, secret rotation, quota/cost controls, incident response, data deletion, and judging-window availability.
@@ -276,4 +277,3 @@
 - [ ] Do not publish the social post or submit the dashboard form without the user's explicit instruction because those actions speak publicly on the user's behalf.
 
 **Done:** The live Cloud Run URL, public repository, social-post draft, and dashboard checklist are complete, verified, and ready for the user's final public-post and submission actions.
-
