@@ -11,10 +11,10 @@ The original feature is the **Context Contract**. Gemini may propose facts, comm
 | ID | Requirement | Acceptance evidence |
 | --- | --- | --- |
 | R1 | Configure Google AI Studio with security-first custom instructions before code generation. | Versioned instructions, threat model, and AI Studio evidence in `docs/ai-studio/`. |
-| R2 | Authenticate with Firebase Google Sign-In. | Sign-in, sign-out, auth persistence, and protected-route tests. |
+| R2 | Authenticate with Firebase Google Sign-In. | Firebase-managed `browserSessionPersistence`, sign-in, sign-out, browser-session close semantics, and protected-route tests; Daymark code never persists or logs auth artifacts elsewhere. |
 | R3 | Support real multi-turn Gemini conversations. | Stored message history is sent in bounded order through `@google/genai`; contract tests cover follow-up context. |
 | R4 | Persist prompts, Gemini replies, and summaries in Cloud Firestore. | Transactional repository tests and history UI. |
-| R5 | Prevent cross-user data leakage. | UID is derived only from a verified Firebase token; two-user negative tests cover every resource route; rules tests enforce owner-only reads and deny client writes. |
+| R5 | Prevent cross-user data leakage. | UID is derived only from a verified Firebase token; every data operation uses the verified same-origin backend; two-user negative tests cover every resource route; rules tests deny every browser/client read and write, including owner-path attempts. |
 | R6 | Keep the Gemini API key out of source and browser bundles. | Server-only environment access, Secret Manager deployment binding, secret scans, and bundle scans. |
 | R7 | Deploy one container to Cloud Run with the required verification label. | Reproducible deployment script and post-deploy verification output. Deployment remains blocked until the release gate passes. |
 | R8 | Ship an original enhancement beyond the starter. | Context Contract proposal, approval, provenance, edit, and retirement flows. |
@@ -25,7 +25,7 @@ The original feature is the **Context Contract**. Gemini may propose facts, comm
 
 ### Same-origin Cloud Run backend-for-frontend (selected)
 
-A React client and an Express API ship in one container. Firebase handles federated sign-in; the client sends a fresh ID token as a bearer token; the server verifies it with Firebase Admin and derives the UID. Only the server calls Gemini and Firestore.
+A React client and an Express API ship in one container. Firebase handles federated sign-in with `browserSessionPersistence`; the client sends a fresh ID token as a bearer token; the server verifies it with Firebase Admin and derives the UID. Firebase alone may keep its managed session-scoped browser auth state, while Daymark application/server code never persists or logs tokens or OAuth artifacts elsewhere. Only the server calls Gemini and Firestore, and every journal or derived-data read and write goes through the verified same-origin backend.
 
 This removes cross-origin deployment complexity, keeps operational credentials server-side, and creates one auditable authorization boundary. It is the smallest architecture that can still meet the production requirements.
 
@@ -137,7 +137,7 @@ Users can export or recursively delete their data. Retention is indefinite until
 
 - Unit tests cover schemas, sanitization, prompt assembly, fallback decisions, auth header parsing, rate-limit keys, error mapping, and Context Contract state transitions.
 - API integration tests use injected fake auth, Firestore, and Gemini adapters to prove every route, validation failure, sanitized dependency failure, retry, and two-user negative case.
-- Firestore Emulator tests prove owner-only reads, denied client writes, and default deny.
+- Firestore Emulator tests deny every browser/client read and write, including authenticated-owner attempts, plus unmatched-path default deny.
 - Property tests exercise sanitizer and UID-scoped path invariants.
 - React tests cover sign-in, protected routing, multi-turn submission, retained drafts on failure, retry, memory approval, history, export, and deletion confirmation.
 - Playwright and axe cover the unauthenticated path and a hermetic authenticated journey without production bypass code.

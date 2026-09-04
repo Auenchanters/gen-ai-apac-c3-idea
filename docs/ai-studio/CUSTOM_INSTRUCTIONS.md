@@ -48,6 +48,7 @@ For each material risk, identify a prevention control, a detection control, and 
 ## 3. Firebase authentication and Firestore isolation
 
 - Use Firebase Authentication with Google Sign-In. Do not create an email-and-password form or store user passwords.
+- Configure Firebase Web Auth with `browserSessionPersistence`. Firebase may maintain its managed browser auth state for the tab session, but Daymark application and server code must never copy, persist, or log an ID token, OAuth artifact, or cookie in local storage, application storage, Firestore, logs, or another custom store. Sign-out or closing the browser session must clear that Firebase-managed session.
 - The browser sends a fresh Firebase ID token as a bearer token to the same-origin API. Verify that token on every protected request with Firebase Admin before any resource lookup or side effect.
 - Derive the authoritative UID only from the verified token. Never accept a UID, Firestore path, owner field, role, model identifier, system instruction, or generation setting from the browser.
 - Protect every journal, message, turn, memory, Compass, export, and deletion route. Return the same sanitized `404` response for an absent resource and a resource owned by another user.
@@ -59,13 +60,13 @@ For each material risk, identify a prevention control, a detection control, and 
   - `users/{verifiedUid}/journals/{journalId}/memories/{memoryId}`
   - `users/{verifiedUid}/compass/{periodKey}`
 
-- Keep Firestore access server-side through Firebase Admin and Application Default Credentials. No public repository method may accept an arbitrary document path.
-- Firestore rules must default-deny, allow only owner-bound direct reads where the product explicitly needs them, and deny all client writes. Admin SDK access is governed by the Cloud Run service identity and IAM, not by client security rules.
+- Keep every Firestore read and write server-side through the verified same-origin API, Firebase Admin, and Application Default Credentials. The browser must never read or write Firestore directly, and no public repository method may accept an arbitrary document path.
+- Firestore rules must default-deny every browser/client read and write, including an authenticated owner accessing their own path. Every journal and derived-data operation goes through a token-protected backend route. Admin SDK access is governed by the Cloud Run service identity and IAM, not by client security rules, so server code must still derive the UID from the verified token and construct only UID-scoped paths.
 - If an administrative capability is ever added, require verified custom claims and a separate threat review. Never trust a role asserted by the client.
 - Use server timestamps, bounded pagination, transactions, validated request IDs, and short turn leases. A completed duplicate request returns its stable stored result.
 - Persist the user message, model reply, summary, journal metadata, and memory proposals atomically. Never report success before the complete transaction commits.
 - Recursively delete journal subcollections and all user data. Deleting a parent document alone is not sufficient.
-- Prove isolation with two-user negative tests for every resource route, Firestore Emulator owner-read and denied-write tests, and property tests showing constructed paths cannot escape `users/{verifiedUid}`.
+- Prove isolation with two-user negative tests for every resource route, Firestore Emulator tests denying all anonymous and authenticated-client reads and writes, and property tests showing constructed paths cannot escape `users/{verifiedUid}`.
 
 ## 4. Secret management and zero-hardcoding hygiene
 
@@ -112,7 +113,7 @@ For each material risk, identify a prevention control, a detection control, and 
 
   - unit tests for schemas, sanitization, prompt assembly, fallback decisions, auth parsing, rate-limit keys, error mapping, and memory transitions;
   - API integration tests with injected auth, Firestore, and Gemini adapters, including every validation failure and two-user negative case;
-  - Firestore Emulator tests for owner-only reads, denied client writes, and default deny;
+  - Firestore Emulator tests proving all browser/client reads and writes are denied, including authenticated-owner attempts, plus unmatched-path default deny;
   - property tests for sanitizer and UID-scoped path invariants;
   - React tests for authentication, protected routing, multi-turn submission, retained drafts, retry, memory controls, history, export, and deletion;
   - Playwright and axe coverage for public and hermetic authenticated journeys without a production bypass;

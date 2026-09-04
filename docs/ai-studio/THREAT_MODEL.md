@@ -25,7 +25,7 @@ The Context Contract governs whether a proposed memory may be reused as durable 
 | Asset | Classification | Handling rule |
 | --- | --- | --- |
 | Gemini authorization key | Secret | Server-only; numbered Secret Manager version; never source, browser, logs, screenshots, transcripts, or shell history |
-| Firebase ID token, OAuth state, cookies | Secret, short-lived | Transport only over HTTPS; verify server-side; never persist or log |
+| Firebase ID token, OAuth state, cookies | Secret, short-lived | Firebase-managed browser session state only; Daymark application/server code never persists or logs them elsewhere; transport only over HTTPS; verify ID tokens server-side; sign-out or browser-session close clears the chosen session persistence |
 | Journal prompts and replies | Highly sensitive user content | UID-scoped storage; bounded model use; no content logging; export/delete only for verified owner |
 | Summaries, themes, next steps, Compass | Sensitive derived content | Same isolation as source journal; model output validated and sanitized |
 | Context Contract proposals and approved memories | Sensitive durable context | Provenance required; approval controls reuse; revisioned edit/retire/delete |
@@ -47,7 +47,7 @@ The Context Contract governs whether a proposed memory may be reused as durable 
 
 | Boundary | Data crossing it | Required enforcement |
 | --- | --- | --- |
-| Browser to Firebase Authentication | Google sign-in flow and Firebase ID token | Firebase-hosted federated flow; no application-managed passwords |
+| Browser to Firebase Authentication | Google sign-in flow and Firebase ID token | Firebase-hosted federated flow; `browserSessionPersistence`; no application-managed passwords or application-managed token storage |
 | Browser to Cloud Run | Public config, bearer token, journal input, route IDs, actions | HTTPS, exact origin, body limit, Zod schemas, verified token, per-UID rate limit |
 | Express route to domain/repository | Verified UID, validated opaque IDs, validated commands | UID passed explicitly as the first repository argument; no arbitrary path API |
 | Cloud Run to Firestore | UID-scoped records and transactions | Dedicated runtime identity, least privilege, server-constructed paths, bounded reads |
@@ -61,7 +61,7 @@ The Context Contract governs whether a proposed memory may be reused as durable 
 1. A UID becomes authoritative only after Firebase Admin verifies the request token.
 2. Every private Firestore path begins with `users/{verifiedUid}` and is constructed on the server.
 3. A foreign resource and a missing resource are externally indistinguishable.
-4. Gemini and Firestore are server-only; the browser cannot choose a model, system instruction, safety setting, UID, or data path.
+4. Gemini and Firestore are server-only; every journal or derived-data read and write goes through the verified same-origin backend, and the browser cannot choose a model, system instruction, safety setting, UID, or data path.
 5. A Gemini authorization key is never shipped to the browser or stored in Git, and a Standard key is invalid as of September 2026.
 6. Model output is data, not authority: schema validation, provenance validation, sanitization, and length limits precede storage or rendering.
 7. A model-proposed memory is excluded from future context until the user approves it; only the user can change durable memory state.
@@ -108,7 +108,7 @@ Risk ratings describe the unmitigated design risk. Controls and evidence are req
 | ID | Risk | Abuse scenario and impact | Required controls | Required evidence |
 | --- | --- | --- | --- | --- |
 | MS-01 | Critical | User A reads, changes, exports, summarizes, or deletes User B's data by guessing IDs. | Verified-token UID only, UID-scoped repositories, uniform `404`, no existence oracle, server-side Firestore. | Two-user tests for list, load, turn, memory, Compass, export, journal delete, and account delete. |
-| MS-02 | Critical | A browser bypasses the API and writes arbitrary Firestore documents. | Firestore default deny and deny all client writes; owner-only direct reads only where explicitly required. | Emulator tests for anonymous deny, foreign read deny, owner-read boundaries, client-write deny, and unmatched-path deny. |
+| MS-02 | Critical | A browser bypasses the API to read or write Firestore directly, including its authenticated owner's path. | Firestore default deny for every browser/client read and write; every journal and derived-data operation uses the verified same-origin backend; server/Admin code still derives the UID from the verified token and constructs only UID-scoped paths because Admin bypasses rules. | Emulator tests denying anonymous and authenticated-client reads and writes, including owner-path attempts, plus unmatched-path deny. |
 | MS-03 | High | Concurrent or retried requests save duplicates or split a user/model pair. | Unique request ID, short reservation lease, completed-result replay, transaction for pair and metadata. | Tests for active lease, expired-lease recovery, simultaneous duplicate requests, and transactional rollback. |
 | MS-04 | High | A database failure clears the draft or UI reports success despite incomplete persistence. | Confirm transaction before success; preserve draft and request ID; accessible retry; sanitize database errors. | Client and service tests for each failure point. |
 | MS-05 | Critical | Deleting a parent leaves message, turn, or memory subcollections behind. | Enumerated recursive deletion for one journal and the complete user hierarchy; bounded batch/retry behavior. | Repository tests that inspect all descendant collections after deletion. |
@@ -167,7 +167,7 @@ The following evidence is blocking. Absence is a failed gate, not an accepted re
 1. AI Studio instructions and first threat-only response recorded without secrets or private account identifiers.
 2. Firebase authentication and protected-route tests.
 3. Two-user negative API tests for every resource operation.
-4. Firestore Emulator owner-read, client-write-deny, and default-deny tests.
+4. Firestore Emulator tests denying every browser/client read and write, including authenticated-owner attempts, plus unmatched-path default deny.
 5. Gemini schema, sanitizer, prompt-injection, provenance, deadline, and fallback tests.
 6. Context Contract proposal, approval, edit, rejection, retirement, deletion, provenance, and stale-revision tests.
 7. Transaction, idempotency, retry, and recursive-deletion tests.

@@ -109,7 +109,7 @@
 
 - [ ] Write two-user failing tests for list, load, write, memory update, export, single-journal delete, and account-data delete.
 - [ ] Implement UID-scoped repository methods with server timestamps, strict payload construction, cursor bounds, and recursive deletion.
-- [ ] Write failing emulator tests for owner-only direct reads, denied client writes, and default deny.
+- [ ] Write failing emulator tests proving every browser/client read and write is denied, including authenticated-owner attempts, plus unmatched-path default deny.
 - [ ] Implement Firestore rules and indexes until the emulator suite passes.
 - [ ] Add property tests proving generated paths cannot escape `users/{verifiedUid}`.
 - [ ] Commit with `feat(storage): enforce user-isolated journal persistence`.
