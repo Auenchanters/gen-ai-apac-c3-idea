@@ -134,7 +134,7 @@ For each material risk, identify a prevention control, a detection control, and 
 ## 8. Deployment, evidence, and README generation
 
 - Ship one container that serves the React application and same-origin Express API. The public Cloud Run URL may serve sign-in and static assets; every private data and generation route remains token-protected.
-- Do not push, publish, create cloud resources, deploy Firestore rules, or deploy Cloud Run until the local release gate is green and an explicit release action is authorized.
+- Reviewed, credential-scanned source pushes to the specified GitHub repository are authorized as of 2026-09-05. Cloud account access, resource creation, Firestore rule deployment, Cloud Run deployment, and public submission remain deferred. Deployment requires renewed authorization and a green local release gate.
 - The release gate includes formatting, zero-warning lint, strict typecheck, coverage, Firestore rules, browser and accessibility tests, production build, bundle scan, secret scan, dependency audit, dead-code and duplication checks, container build/run, and security review.
 - Deploy with the dedicated user-managed runtime service account, bounded memory and concurrency, a maximum instance count, startup CPU boost, a health check, and a numbered Secret Manager binding.
 - Apply the mandatory Cloud Run label exactly: `dev-tutorial=cloud-run-ai-challenge`.

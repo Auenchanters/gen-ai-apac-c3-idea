@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` to implement this plan task by task. Every behavior change follows red-green-refactor and every checkpoint is evidence-based.
 
-**Goal:** Build, secure, verify, document, and prepare Daymark for the Cloud Run AI Challenge without pushing or deploying before the production release gate passes.
+**Goal:** Build, secure, verify, document, and prepare Daymark for the Cloud Run AI Challenge. Push reviewed, credential-scanned source milestones as authorized on 2026-09-05; keep Cloud account access and deployment deferred.
 
 **Architecture:** One stateless Cloud Run container serves a code-split React client and an Express backend-for-frontend. Firebase verifies identity; backend repositories derive every Firestore path from the verified UID; Gemini and Firestore remain server-only; Secret Manager injects the Gemini key.
 
@@ -14,7 +14,7 @@
 
 - Target Google Cloud project: `gen-ai-apac-c3-idea` (`379963899770`). Verify with read-only commands before using it.
 - Target repository: `https://github.com/Auenchanters/gen-ai-apac-c3-idea.git`; it was empty at planning time.
-- Do not push, publish, create cloud resources, deploy Firestore rules, or deploy Cloud Run until Task 12 passes.
+- Reviewed, credential-scanned source commits may be pushed to the user-specified GitHub repository (authorization updated 2026-09-05). Cloud account access, cloud resource creation, Firestore rule deployment, Cloud Run deployment, and public submission remain deferred. Deployment additionally requires Task 12 to pass.
 - Required Cloud Run label: `dev-tutorial=cloud-run-ai-challenge`.
 - Gemini primary model: `gemini-3.6-flash`; recoverable fallback sequence: `gemini-3.1-flash-lite`, `gemini-flash-latest`, `gemini-3.7-flash`.
 - The Gemini credential must be an authorization key, not a standard API key. Google documents rejection of standard keys beginning September 2026.

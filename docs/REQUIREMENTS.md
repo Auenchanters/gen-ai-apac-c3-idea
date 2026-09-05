@@ -19,7 +19,7 @@ This matrix turns the binding [Daymark secure journal design](superpowers/specs/
 | Design-time threat model | Recorded locally in [THREAT_MODEL.md](ai-studio/THREAT_MODEL.md). |
 | AI Studio configuration and first response | Not recorded; follow [SETUP_EVIDENCE.md](ai-studio/SETUP_EVIDENCE.md). |
 | Application behavior, automated tests, cloud configuration, and deployment | This matrix makes no implementation or pass claim. Evidence is admitted only as later tasks produce it. |
-| Push, publication, and deployment | Intentionally blocked until the local Task 12 release gate passes and the relevant external action is authorized. |
+| Push, publication, and deployment | Reviewed, credential-scanned source pushes authorized on 2026-09-05. Cloud account access, deployment, and public submission remain deferred. Deployment also requires the local Task 12 gate. |
 
 ## Product requirements
 

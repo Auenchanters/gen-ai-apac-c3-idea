@@ -148,4 +148,4 @@ Users can export or recursively delete their data. Retention is indefinite until
 
 The runtime uses a dedicated user-managed service account with Firestore access and `roles/secretmanager.secretAccessor` granted only on the Gemini secret. The Gemini credential is an authorization key created in AI Studio and bound to a service account, not a deprecated standard key. Cloud Run receives a numbered secret version through `--set-secrets`; no `GOOGLE_APPLICATION_CREDENTIALS` variable or key file is used. The deployment sets bounded memory, concurrency, maximum instances, startup CPU boost, and the mandatory label `dev-tutorial=cloud-run-ai-challenge`.
 
-No cloud mutation, GitHub push, or public deployment occurs until every local gate is green and the release audit reports no high or critical issue.
+The user authorized reviewed, credential-scanned source pushes to the specified GitHub repository on 2026-09-05. Cloud account access and deployment remain deferred. No cloud mutation or public deployment occurs until authorization is renewed, every local gate is green, and the release audit reports no high or critical issue.
