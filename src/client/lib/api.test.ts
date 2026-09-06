@@ -24,6 +24,20 @@ describe('same-origin API client', () => {
       })
     );
   });
+  it('serializes an explicit mutation body and content type', async () => {
+    const network = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response('{"ok":true}', { status: 200 }));
+    const client = new ApiClient(() => Promise.resolve('token'), network);
+    await client.send('/api/journals', 'POST', z.object({ ok: z.boolean() }), { title: 'Today' });
+    expect(network).toHaveBeenCalledWith(
+      '/api/journals',
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ title: 'Today' })
+      })
+    );
+  });
   it('never sends a token to external or traversal URLs', async () => {
     const network = vi.fn<typeof fetch>();
     const client = new ApiClient(() => Promise.resolve('token'), network);

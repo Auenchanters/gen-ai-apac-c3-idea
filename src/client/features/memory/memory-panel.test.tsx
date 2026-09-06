@@ -46,6 +46,21 @@ function Harness(): React.JSX.Element {
     </AuthProvider>
   );
 }
+function EmptyHarness(): React.JSX.Element {
+  const [items, setItems] = useState([item]);
+  return (
+    <AuthProvider adapter={auth}>
+      <MemoryPanel
+        journalId="704d9e67-3bf9-42f9-bf24-e5381c602fef"
+        items={items}
+        onChange={setItems}
+        messages={[]}
+        summary=""
+        nextStep=""
+      />
+    </AuthProvider>
+  );
+}
 it('keeps a proposal unapproved until the saved approval is confirmed', async () => {
   let payload: unknown;
   vi.stubGlobal('fetch', (_input: RequestInfo | URL, options?: RequestInit) => {
@@ -59,4 +74,18 @@ it('keeps a proposal unapproved until the saved approval is confirmed', async ()
   expect(await screen.findByText('approved')).toBeDefined();
   expect(payload).toEqual({ revision: 0, action: 'approve' });
   expect(screen.getByRole('button', { name: 'Retire memory' })).toBeDefined();
+});
+
+it('shows empty summary guidance and removes a deleted memory from the panel', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(new Response(JSON.stringify({ deleted: true })))
+  );
+  render(<EmptyHarness />);
+  expect(screen.getByText('Your first reflection will create a summary here.')).toBeDefined();
+  expect(screen.getByText('Source is not available in this view.')).toBeDefined();
+  await userEvent.click(screen.getByRole('button', { name: 'Delete memory' }));
+  await userEvent.type(screen.getByLabelText('Type DELETE to confirm'), 'DELETE');
+  await userEvent.click(screen.getByRole('button', { name: 'Permanently delete' }));
+  expect(await screen.findByText('No suggested memories yet. Nothing to approve.')).toBeDefined();
 });

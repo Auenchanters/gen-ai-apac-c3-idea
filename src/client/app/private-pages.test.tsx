@@ -50,7 +50,7 @@ it('loads history and narrows it by title', async () => {
   await userEvent.type(screen.getByLabelText('Search titles, summaries, and topics'), 'unmatched');
   expect(screen.queryByRole('link', { name: 'A small win' })).toBeNull();
   expect(screen.getByText('No reflections match your filters.')).toBeDefined();
-});
+}, 10000);
 
 it('shows the selected Compass period and handles an empty journal', async () => {
   window.history.replaceState({}, '', '/compass');

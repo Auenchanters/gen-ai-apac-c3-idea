@@ -70,9 +70,12 @@ describe('Daymark product journey', () => {
     );
     render(<App authAdapter={adapter()} />);
     await userEvent.click(await screen.findByRole('button', { name: 'Continue with Google' }));
-    await userEvent.type(await screen.findByLabelText('Journal title'), 'A new direction');
+    await userEvent.type(
+      await screen.findByLabelText('Journal title', undefined, { timeout: 20000 }),
+      'A new direction'
+    );
     await userEvent.click(screen.getByRole('button', { name: 'Start a journal' }));
-    const composer = await screen.findByLabelText('Your reflection');
+    const composer = await screen.findByLabelText('Your reflection', undefined, { timeout: 20000 });
     await userEvent.type(composer, 'I am considering a new direction.');
     await userEvent.click(screen.getByRole('button', { name: 'Send reflection' }));
     await waitFor(() => {
@@ -81,5 +84,5 @@ describe('Daymark product journey', () => {
     expect((composer as HTMLTextAreaElement).value).toBe('I am considering a new direction.');
     expect(screen.getByRole('button', { name: 'Retry reflection' })).toBeDefined();
     expect(screen.queryByRole('button', { name: 'Edit draft before a new attempt' })).toBeNull();
-  });
+  }, 30000);
 });

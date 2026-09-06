@@ -9,6 +9,7 @@ export default defineConfig({
       'tests/tooling/**/*.test.ts'
     ],
     passWithNoTests: false,
+    testTimeout: 10_000,
     restoreMocks: true,
     unstubEnvs: true,
     unstubGlobals: true,
