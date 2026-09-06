@@ -10,6 +10,8 @@ export default defineConfig({
     ],
     passWithNoTests: false,
     testTimeout: 10_000,
+    pool: 'threads',
+    maxWorkers: 4,
     restoreMocks: true,
     unstubEnvs: true,
     unstubGlobals: true,
