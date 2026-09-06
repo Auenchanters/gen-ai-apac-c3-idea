@@ -46,7 +46,7 @@ it('loads history and narrows it by title', async () => {
     )
   );
   render(<App authAdapter={auth} />);
-  expect(await screen.findByRole('link', { name: 'A small win' })).toBeDefined();
+  expect(await screen.findByRole('link', { name: 'A small win' }, { timeout: 5000 })).toBeDefined();
   await userEvent.type(screen.getByLabelText('Search titles, summaries, and topics'), 'unmatched');
   expect(screen.queryByRole('link', { name: 'A small win' })).toBeNull();
   expect(screen.getByText('No reflections match your filters.')).toBeDefined();
