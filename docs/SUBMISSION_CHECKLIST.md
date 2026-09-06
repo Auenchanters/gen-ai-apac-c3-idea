@@ -6,7 +6,7 @@ The user supplied a screenshot of the submission form on 2026-09-05. These are t
 | --- | --- | --- |
 | Working prototype link | Cloud Run deployment URL, or a blog/video showing an app walkthrough | Use the published Hugging Face article after adding screenshots or a screen recording |
 | Demo social post link | Public post using `#AccelerateAIwithCloudRun` | Use `docs/submission/LINKEDIN_POST.md` after publishing |
-| Public code repository link | Public GitHub or GitLab URL including `https://` or `http://` | `https://github.com/Auenchanters/gen-ai-apac-c3-idea` after the authorized push and visibility check |
+| Public code repository link | Public GitHub or GitLab URL including `https://` or `http://` | Pushed to `main` at commit `69218d6`; confirm the repository is publicly visible before submitting |
 | Brief solution description | Explain Firebase, Firestore, Cloud Run, and Gemini use; maximum 1,024 characters | Copy `docs/submission/BRIEF_DESCRIPTION.md` into the dashboard field |
 
 The form also requires confirmation of all four services:
